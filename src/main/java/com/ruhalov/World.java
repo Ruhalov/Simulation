@@ -27,7 +27,11 @@ public class World {
         return world;
     }
 
-    public void setEntity(Coordinates coordinates, Entity entity) {
-        world.put(coordinates, entity);
+    public void setEntity(Entity entity) {
+        world.put(entity.getCoordinates(), entity);
+    }
+
+    public void clearCell(Coordinates coordinates) {
+        world.remove(coordinates);
     }
 }
