@@ -31,6 +31,10 @@ public class World {
         world.put(entity.getCoordinates(), entity);
     }
 
+    public Entity getEntity(Coordinates coordinates) {
+        return world.get(coordinates);
+    }
+
     public void clearCell(Coordinates coordinates) {
         world.remove(coordinates);
     }
