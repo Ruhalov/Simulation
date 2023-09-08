@@ -23,8 +23,26 @@ public class World {
         return height;
     }
 
-    public HashMap<Coordinates, Entity> getWorld() {
-        return world;
+    public ArrayList<Coordinates> getNeighboringCoordinates(Coordinates coordinates) {
+        ArrayList<Coordinates> neighbors = new ArrayList<>(4);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (coordinates.getX() + j == coordinates.getX() &&
+                        coordinates.getY() + i != coordinates.getY()) {
+
+                    Coordinates convertedCoordinates = CoordinatesConverter.convertCoordinates(
+                            new Coordinates(coordinates.getX() + j, coordinates.getY() + i), this);
+                    neighbors.add(convertedCoordinates);
+                } else if (coordinates.getX() + j != coordinates.getX() &&
+                        coordinates.getY() + i == coordinates.getY()) {
+
+                    Coordinates convertedCoordinates = CoordinatesConverter.convertCoordinates(
+                            new Coordinates(coordinates.getX() + j, coordinates.getY() + i), this);
+                    neighbors.add(convertedCoordinates);
+                }
+            }
+        }
+        return neighbors;
     }
 
     public void setEntity(Entity entity) {
@@ -37,5 +55,9 @@ public class World {
 
     public void clearCell(Coordinates coordinates) {
         world.remove(coordinates);
+    }
+
+    public boolean isEmptyCell(Coordinates coordinates) {
+        return !world.containsKey(coordinates);
     }
 }
