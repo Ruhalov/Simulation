@@ -1,6 +1,8 @@
 package com.ruhalov.entity.creature;
 
 import com.ruhalov.Coordinates;
+import com.ruhalov.World;
+
 
 public class Predator extends Creature {
     public Predator(Coordinates coordinates) {
@@ -8,7 +10,8 @@ public class Predator extends Creature {
     }
 
     @Override
-    public void makeMove() {
-        coordinates.setY(coordinates.getY() + 1);
+    public void makeMove(World world) {
+        huntsForTarget(Herbivore.class, world);
     }
 }
+
