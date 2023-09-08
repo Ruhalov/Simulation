@@ -2,7 +2,8 @@ package com.ruhalov;
 
 import com.ruhalov.entity.Entity;
 
-import java.util.HashMap;
+import java.util.*;
+
 
 public class World {
     private final int width;
@@ -51,6 +52,20 @@ public class World {
 
     public Entity getEntity(Coordinates coordinates) {
         return world.get(coordinates);
+    }
+
+    public <T extends Entity> List<T> getEntitiesByClass(Class<T> objectClass) {
+        List<T> entities = new ArrayList<>();
+        for (Map.Entry<Coordinates, Entity> e : world.entrySet()) {
+            if (objectClass.isInstance(e.getValue())) {
+                entities.add((T) e.getValue());
+            }
+        }
+        return entities;
+    }
+
+    public Set<Coordinates> getAllEntityCoordinates() {
+        return world.keySet();
     }
 
     public void clearCell(Coordinates coordinates) {
