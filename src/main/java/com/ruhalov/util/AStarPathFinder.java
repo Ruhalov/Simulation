@@ -13,18 +13,21 @@ import static java.lang.Math.abs;
 
 public class AStarPathFinder {
     private ArrayList<Coordinates> pathToTarget; //TODO: не используется ретерн не возвращается, если путь найден он строиться методом calculatePathFromNode()
-    private final List<Node> openNodes = new ArrayList<>();
-    private final List<Node> closedNodes = new ArrayList<>();
+    private List<Node> openNodes;
+    private List<Node> closedNodes;
     private Coordinates target;
 
     public List<Coordinates> findPathToTarget(Coordinates start,
-                                               Coordinates target,
-                                               World world) {
+                                              Coordinates target,
+                                              World world) {
+        openNodes = new ArrayList<>();
+        closedNodes = new ArrayList<>();
         this.target = target;
         if (start.equals(target)) {
             return pathToTarget;
         }
         Node startNode = new Node(start, 0, null);
+        startNode.setF(manhattanDistance(startNode.getPosition(), target, world));
         closedNodes.add(startNode);
         openNodes.addAll(getAvailableNeighboringNodes(startNode, world));
         while (!openNodes.isEmpty()) {
@@ -33,18 +36,19 @@ public class AStarPathFinder {
             if (nodeToCheck.getPosition().equals(target)) {
                 return calculatePathFromNode(nodeToCheck);
             }
-            openNodes.remove(nodeToCheck);
             closedNodes.add(nodeToCheck);
-
+            openNodes.remove(nodeToCheck);
             for (Node neighbour : getAvailableNeighboringNodes(nodeToCheck, world)) {
-                if (closedNodes.contains(neighbour)) {
-                    continue;
-                }
+                if (closedNodes.contains(neighbour)) { continue; }
                 neighbour.setF(neighbour.getDistanceFromStartToNode() + manhattanDistance(neighbour.getPosition(), target, world));
-                if (openNodes.contains(neighbour) && openNodes.stream().anyMatch(x -> x.getDistanceFromStartToNode() < neighbour.getDistanceFromStartToNode())) {
-                    continue;
+                if (!openNodes.contains(neighbour) || nodeToCheck.getDistanceFromStartToNode() + 1 < neighbour.getDistanceFromStartToNode()) {
+                    neighbour.setDistanceFromStartToNode(nodeToCheck.getDistanceFromStartToNode() + 1);
+                    neighbour.setF(neighbour.getDistanceFromStartToNode() + manhattanDistance(neighbour.getPosition(), target, world));
+                    neighbour.setPreviousNode(nodeToCheck);
+                    if (!openNodes.contains(neighbour)) {
+                        openNodes.add(neighbour);
+                    }
                 }
-                openNodes.add(neighbour);
             }
         }
         return pathToTarget;
@@ -52,10 +56,10 @@ public class AStarPathFinder {
 
     private List<Coordinates> calculatePathFromNode(Node node) {
         List<Coordinates> path = new ArrayList<>();
-        Node currNode = new Node(node.getPosition(), node.getDistanceFromStartToNode(), node.getPreviusNode());
+        Node currNode = new Node(node.getPosition(), node.getDistanceFromStartToNode(), node.getPreviousNode());
         while (currNode != null) {
             path.add(currNode.getPosition());
-            currNode = currNode.getPreviusNode();
+            currNode = currNode.getPreviousNode();
         }
         Collections.reverse(path);
         return path;
@@ -88,22 +92,22 @@ public class AStarPathFinder {
         int distX = abs(start.getX() - target.getX());
         int distY = abs(start.getY() - target.getY());
 
-        if (start.getX() > target.getX() &&
-                start.getY() > target.getY()) {
+        if (start.getX() >= target.getX() &&
+                start.getY() >= target.getY()) {
             DistanceWithXTransition = distXWithRightTransition + distY;
             DistanceWithYTransition = distYWithDownTransition + distX;
             DistanceWithXYTransitions = distXWithRightTransition + distYWithDownTransition;
-        } else if (start.getX() < target.getX() &&
-                start.getY() > target.getY()) {
+        } else if (start.getX() <= target.getX() &&
+                start.getY() >= target.getY()) {
             DistanceWithXTransition = distXWithLeftTransition + distY;
             DistanceWithYTransition = distYWithDownTransition + distX;
             DistanceWithXYTransitions = distXWithLeftTransition + distYWithDownTransition;
-        } else if (start.getX() > target.getX() &&
+        } else if (start.getX() >= target.getX() &&
                 start.getY() < target.getY()) {
             DistanceWithXTransition = distXWithRightTransition + distY;
             DistanceWithYTransition = distYWithDownTransition + distX;
             DistanceWithXYTransitions = distXWithRightTransition + distYWithDownTransition;
-        } else if (start.getX() < target.getX() &&
+        } else if (start.getX() <= target.getX() &&
                 start.getY() < target.getY()) {
             DistanceWithXTransition = distXWithLeftTransition + distY;
             DistanceWithYTransition = distYWithUpTransition + distX;
