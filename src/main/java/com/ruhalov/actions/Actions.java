@@ -1,4 +1,4 @@
-package com.ruhalov.action;
+package com.ruhalov.actions;
 
 import com.ruhalov.World;
 
