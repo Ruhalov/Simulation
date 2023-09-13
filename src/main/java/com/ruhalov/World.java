@@ -75,4 +75,11 @@ public class World {
     public boolean isEmptyCell(Coordinates coordinates) {
         return !world.containsKey(coordinates);
     }
+
+    public List<Coordinates> getEmptyNeighbouringCells(Coordinates coordinates) {
+        return getNeighboringCoordinates(coordinates)
+                .stream()
+                .filter(this::isEmptyCell)
+                .toList();
+    }
 }
