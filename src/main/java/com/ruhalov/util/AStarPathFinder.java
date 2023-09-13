@@ -12,7 +12,7 @@ import static java.lang.Math.abs;
 
 
 public class AStarPathFinder {
-    private ArrayList<Coordinates> pathToTarget; //TODO: не используется ретерн не возвращается, если путь найден он строиться методом calculatePathFromNode()
+    private final ArrayList<Coordinates> pathToTarget = new ArrayList<>(); //TODO: не используется ретерн не возвращается, если путь найден он строиться методом calculatePathFromNode()
     private List<Node> openNodes;
     private List<Node> closedNodes;
     private Coordinates target;
@@ -56,7 +56,7 @@ public class AStarPathFinder {
 
     private List<Coordinates> calculatePathFromNode(Node node) {
         List<Coordinates> path = new ArrayList<>();
-        Node currNode = new Node(node.getPosition(), node.getDistanceFromStartToNode(), node.getPreviousNode());
+        Node currNode = new Node(node.getPreviousNode().getPosition(), node.getPreviousNode().getDistanceFromStartToNode(), node.getPreviousNode().getPreviousNode()); //todo fix
         while (currNode != null) {
             path.add(currNode.getPosition());
             currNode = currNode.getPreviousNode();
