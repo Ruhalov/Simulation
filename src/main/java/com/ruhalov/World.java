@@ -64,8 +64,8 @@ public class World {
         return entities;
     }
 
-    public Set<Coordinates> getAllEntityCoordinates() {
-        return world.keySet();
+    public Collection<Entity> getAllEntities() {
+        return world.values();
     }
 
     public void clearCell(Coordinates coordinates) {
