@@ -40,40 +40,10 @@ public class Simulation {
             action.perform(world);
         }
 
+        ConsoleRenderer renderer = new ConsoleRenderer();
+
         while (true) {
-            for (int i = 0; i < world.getHeight(); i++) {
-                for (int j = 0; j < world.getWidth(); j++) {
-                    Coordinates coordinates = new Coordinates(j, i);
-                    int numOfEntity = world.getAllEntities().size();
-                    for (Entity ent : world.getAllEntities()) {
-                        if (ent.getCoordinates().equals(coordinates)) {
-                            if (ent instanceof Predator) {
-                                System.out.print("\033[0;100m\uD83D\uDFE5");
-                                System.out.print("\033[0m");
-                            } else if (ent instanceof Herbivore) {
-                                System.out.print("\033[0;100m\uD83D\uDFE8");
-                                System.out.print("\033[0m");
-                            } else if (ent instanceof Grass) {
-                                System.out.print("\033[0;100m\uD83D\uDFE2");
-                                System.out.print("\033[0m");
-                            } else if (ent instanceof Rock) {
-                                System.out.print("\033[0;100m⚫");
-                                System.out.print("\033[0m");
-                            } else if (ent instanceof Tree) {
-                                System.out.print("\033[0;100m\uD83D\uDFE4");
-                                System.out.print("\033[0m");
-                            }
-                        } else {
-                            numOfEntity--;
-                            if (numOfEntity == 0) {
-                                System.out.print("\033[0;100m⬜");
-                                System.out.print("\033[0m");
-                            }
-                        }
-                    }
-                }
-                System.out.println();
-            }
+            renderer.render(world);
             growGrass.perform(world);
             moveAll.perform(world);
             turnToTrees.perform(world);
