@@ -1,6 +1,7 @@
 package com.ruhalov;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 public final class Configurations {
@@ -9,8 +10,8 @@ public final class Configurations {
 
     private Configurations() {
         this.properties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream("src/main/java/com/ruhalov/simulation.properties")) {
-            properties.load(fileInputStream);
+        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("simulation.properties")) {
+            properties.load(inputStream);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
