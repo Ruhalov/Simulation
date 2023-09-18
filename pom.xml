@@ -34,7 +34,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.ruhalov.Simulation</mainClass>
+              <mainClass>com.ruhalov.Main</mainClass>
             </manifest>
           </archive>
         </configuration>
