@@ -5,51 +5,42 @@ import com.ruhalov.actions.GrowGrass;
 import com.ruhalov.actions.MoveAllCreature;
 import com.ruhalov.actions.TurnGrassToTrees;
 import com.ruhalov.actions.spawn.*;
-import com.ruhalov.entity.Entity;
-import com.ruhalov.entity.creature.Herbivore;
-import com.ruhalov.entity.creature.Predator;
-import com.ruhalov.entity.objects.Grass;
-import com.ruhalov.entity.objects.stationary.Rock;
-import com.ruhalov.entity.objects.stationary.Tree;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static com.ruhalov.Constants.*;
 
 public class Simulation {
-    public static void main(String[] args) throws InterruptedException {
-        World world = new World(15, 15);
-
-        Actions moveAll = new MoveAllCreature();
-        Actions growGrass = new GrowGrass();
-        Actions turnToTrees = new TurnGrassToTrees();
-
-        Actions spawnHerbivores = new SpawnHerbivoreAction(5);
-        Actions spawnPredators = new SpawnPredatorAction(4);
-        Actions spawnGrass = new SpawnGrassAction(6);
-        Actions spawnTrees = new SpawnTreeAction(3);
-        Actions spawnRock = new SpawnRockAction(4);
-
-        List<Actions> initActions = new ArrayList<>();
-        initActions.add(spawnGrass);
-        initActions.add(spawnPredators);
-        initActions.add(spawnHerbivores);
-        initActions.add(spawnTrees);
-        initActions.add(spawnRock);
-
+    public void start() {
+        World world = new World(WORLD_WIDTH, WORLD_HEIGHT);
+        List<Actions> initActions = getInitActionsList();
+        List<Actions> turnActions = getTurnActionsList();
         for (Actions action : initActions) {
             action.perform(world);
         }
-
         ConsoleRenderer renderer = new ConsoleRenderer();
-
         while (true) {
             renderer.render(world);
-            growGrass.perform(world);
-            moveAll.perform(world);
-            turnToTrees.perform(world);
-            Thread.sleep(1000);
-            System.out.print("----------------------------------\n");
-
+            for (Actions action : turnActions) {
+                action.perform(world);
+            }
         }
+    }
+
+    private List<Actions> getInitActionsList() {
+        Actions spawnHerbivores = new SpawnHerbivoreAction(SPAWN_RATE_HERBIVORE);
+        Actions spawnPredators = new SpawnPredatorAction(SPAWN_RATE_PREDATOR);
+        Actions spawnGrass = new SpawnGrassAction(SPAWN_RATE_GRASS);
+        Actions spawnTrees = new SpawnTreeAction(SPAWN_RATE_TREE);
+        Actions spawnRock = new SpawnRockAction(SPAWN_RATE_ROCK);
+        return Stream.of(spawnGrass, spawnPredators, spawnHerbivores, spawnTrees, spawnRock).toList();
+    }
+
+    private List<Actions> getTurnActionsList() {
+        Actions moveAll = new MoveAllCreature();
+        Actions growGrass = new GrowGrass();
+        Actions turnToTrees = new TurnGrassToTrees();
+        return Stream.of(moveAll, growGrass, turnToTrees).toList();
     }
 }
