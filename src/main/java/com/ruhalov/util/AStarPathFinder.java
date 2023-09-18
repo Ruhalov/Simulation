@@ -118,4 +118,12 @@ public class AStarPathFinder {
                 DistanceWithYTransition,
                 DistanceWithXYTransitions).min(Integer::compareTo).get();
     }
+    public <T extends Entity> T selectNearestTarget(Coordinates start, List<T> targets, World world) {
+        TreeMap<Integer, T> distancesToTarget = new TreeMap<>();
+        for (T entity : targets) {
+            int distance = manhattanDistance(start, entity.getCoordinates(), world);
+            distancesToTarget.put(distance, entity);
+        }
+        return distancesToTarget.get(distancesToTarget.firstKey());
+    }
 }

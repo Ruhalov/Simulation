@@ -75,21 +75,4 @@ public abstract class Creature extends Entity {
             go(coordinatesToMove, world);
         }
     }
-
-    public <T extends Entity> T selectNearestTarget(List<T> entities, World world) {
-        TreeMap<Integer, T> distancesToTarget = new TreeMap<>();
-        for (T entity : entities) {
-            int distance = pathFinder.manhattanDistance(coordinates, entity.getCoordinates(), world);
-            distancesToTarget.put(distance, entity);
-        }
-        return distancesToTarget.get(distancesToTarget.firstKey());
-    }
-
-    public void go(Coordinates coordinatesToMove, World world) {
-        world.clearCell(coordinates);
-        Coordinates convertedCoordinates = CoordinatesConverter.convertCoordinates(coordinatesToMove, world);
-        coordinates.setX(convertedCoordinates.getX());
-        coordinates.setY(convertedCoordinates.getY());
-        world.setEntity(this);
-    }
 }
