@@ -2,10 +2,12 @@ package com.ruhalov.util;
 
 import com.ruhalov.Coordinates;
 import com.ruhalov.World;
+import com.ruhalov.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static java.lang.Math.abs;
@@ -13,23 +15,18 @@ import static java.lang.Math.abs;
 
 public class AStarPathFinder {
     private final ArrayList<Coordinates> pathToTarget = new ArrayList<>(); //TODO: не используется ретерн не возвращается, если путь найден он строиться методом calculatePathFromNode()
-    private List<Node> openNodes;
-    private List<Node> closedNodes;
     private Coordinates target;
 
-    public List<Coordinates> findPathToTarget(Coordinates start,
-                                              Coordinates target,
-                                              World world) {
-        openNodes = new ArrayList<>();
-        closedNodes = new ArrayList<>();
+    public List<Coordinates> findPathToTarget(Coordinates start, Coordinates target, World world) {
         this.target = target;
         if (start.equals(target)) {
             return pathToTarget;
         }
         Node startNode = new Node(start, 0, null);
         startNode.setF(manhattanDistance(startNode.getPosition(), target, world));
+        List<Node> closedNodes = new ArrayList<>();
+        List<Node> openNodes = new ArrayList<>(getAvailableNeighboringNodes(startNode, world));
         closedNodes.add(startNode);
-        openNodes.addAll(getAvailableNeighboringNodes(startNode, world));
         while (!openNodes.isEmpty()) {
             openNodes.forEach(x -> x.setF(x.getDistanceFromStartToNode() + manhattanDistance(x.getPosition(), target, world)));
             Node nodeToCheck = openNodes.stream().min(Node::compareTo).get();
@@ -39,7 +36,9 @@ public class AStarPathFinder {
             closedNodes.add(nodeToCheck);
             openNodes.remove(nodeToCheck);
             for (Node neighbour : getAvailableNeighboringNodes(nodeToCheck, world)) {
-                if (closedNodes.contains(neighbour)) { continue; }
+                if (closedNodes.contains(neighbour)) {
+                    continue;
+                }
                 neighbour.setF(neighbour.getDistanceFromStartToNode() + manhattanDistance(neighbour.getPosition(), target, world));
                 if (!openNodes.contains(neighbour) || nodeToCheck.getDistanceFromStartToNode() + 1 < neighbour.getDistanceFromStartToNode()) {
                     neighbour.setDistanceFromStartToNode(nodeToCheck.getDistanceFromStartToNode() + 1);
@@ -76,14 +75,11 @@ public class AStarPathFinder {
         return availableNeighboringNodes;
     }
 
-    public int manhattanDistance(Coordinates start,
-                                 Coordinates target,
-                                 World world) {
-        int DistanceWithoutAxisTransitions = abs(start.getX() - target.getX()) +
-                abs(start.getY() - target.getY());
-        int DistanceWithXTransition = 0;
-        int DistanceWithYTransition = 0;
-        int DistanceWithXYTransitions = 0;
+    public int manhattanDistance(Coordinates start, Coordinates target, World world) {
+        int distanceWithoutAxisTransitions = abs(start.getX() - target.getX()) + abs(start.getY() - target.getY());
+        int distanceWithXTransition = 0;
+        int distanceWithYTransition = 0;
+        int distanceWithXYTransitions = 0;
 
         int distXWithRightTransition = abs(world.getWidth() - start.getX() + target.getX());
         int distXWithLeftTransition = abs(world.getWidth() - target.getX() + start.getX());
@@ -92,31 +88,26 @@ public class AStarPathFinder {
         int distX = abs(start.getX() - target.getX());
         int distY = abs(start.getY() - target.getY());
 
-        if (start.getX() >= target.getX() &&
-                start.getY() >= target.getY()) {
-            DistanceWithXTransition = distXWithRightTransition + distY;
-            DistanceWithYTransition = distYWithDownTransition + distX;
-            DistanceWithXYTransitions = distXWithRightTransition + distYWithDownTransition;
-        } else if (start.getX() <= target.getX() &&
-                start.getY() >= target.getY()) {
-            DistanceWithXTransition = distXWithLeftTransition + distY;
-            DistanceWithYTransition = distYWithDownTransition + distX;
-            DistanceWithXYTransitions = distXWithLeftTransition + distYWithDownTransition;
-        } else if (start.getX() >= target.getX() &&
-                start.getY() < target.getY()) {
-            DistanceWithXTransition = distXWithRightTransition + distY;
-            DistanceWithYTransition = distYWithDownTransition + distX;
-            DistanceWithXYTransitions = distXWithRightTransition + distYWithDownTransition;
-        } else if (start.getX() <= target.getX() &&
-                start.getY() < target.getY()) {
-            DistanceWithXTransition = distXWithLeftTransition + distY;
-            DistanceWithYTransition = distYWithUpTransition + distX;
-            DistanceWithXYTransitions = distXWithLeftTransition + distYWithUpTransition;
+        if (start.getX() >= target.getX() && start.getY() >= target.getY()) {
+            distanceWithXTransition = distXWithRightTransition + distY;
+            distanceWithYTransition = distYWithDownTransition + distX;
+            distanceWithXYTransitions = distXWithRightTransition + distYWithDownTransition;
+        } else if (start.getX() <= target.getX() && start.getY() >= target.getY()) {
+            distanceWithXTransition = distXWithLeftTransition + distY;
+            distanceWithYTransition = distYWithDownTransition + distX;
+            distanceWithXYTransitions = distXWithLeftTransition + distYWithDownTransition;
+        } else if (start.getX() >= target.getX() && start.getY() < target.getY()) {
+            distanceWithXTransition = distXWithRightTransition + distY;
+            distanceWithYTransition = distYWithDownTransition + distX;
+            distanceWithXYTransitions = distXWithRightTransition + distYWithDownTransition;
+        } else if (start.getX() <= target.getX() && start.getY() < target.getY()) {
+            distanceWithXTransition = distXWithLeftTransition + distY;
+            distanceWithYTransition = distYWithUpTransition + distX;
+            distanceWithXYTransitions = distXWithLeftTransition + distYWithUpTransition;
         }
-        return Stream.of(DistanceWithoutAxisTransitions,
-                DistanceWithXTransition,
-                DistanceWithYTransition,
-                DistanceWithXYTransitions).min(Integer::compareTo).get();
+        return Stream.of(distanceWithoutAxisTransitions, distanceWithXTransition, distanceWithYTransition, distanceWithXYTransitions)
+                .min(Integer::compareTo)
+                .get();
     }
     public <T extends Entity> T selectNearestTarget(Coordinates start, Class<T> classOfTarget, World world) {
         List<T> targets = world.getEntitiesByClass(classOfTarget);
